@@ -27,6 +27,9 @@
  * qnt_papel (int) -> Define a quantidade de papéis;
  * qnt_tempo (double) -> Define a quantidade de qnt_tempo;
  * telaJogo (enum {MENU, UPGRADE, DELAY, FASE}) -> Define quais serão as telas;
+ * val_desc_papel (int) -> Define a quantidade de papel descontado a cada clique do jogador;
+ * qnt_bonus_papel(int) -> Define a quantidade total de papel a ser descontado como bônus do upgrade;
+ * qnt_bonus_tempo(double) -> Define a quantidade total de tempo a ser acrescentado como bônus do upgrade;
  *                  |JOGO|
  *
  *                  |Objeto|
@@ -44,13 +47,16 @@ int main(void)
     const int telaLargura = 1280;
     const int telaComprimento = 720;
 
-    int qnt_papel = 10;                                                                                                       //Quantidade de papel necessário para vencer
+    int qnt_papel;                                                                                                       //Quantidade de papel necessário para vencer
     int qnt_cont_frames = 0;                                                                                             //Definindo uma variável contadora (vantagem em relação ao Wait é que com ela podemos encerrar a aplicação a qualquer momento)
     int fase_delay;                                                                                                      //Tempo de delay inicial da fase
     int fase_nivel;                                                                                                      //Definindo o nível
     int upg_escolha;                                                                                                     //Guarda o id do upgrade escolhido
+    int val_desc_papel = 1;                                                                                              //Quantidade de papel descontado a cada clique
+    int qnt_bonus_papel = 0;                                                                                             //Quantidade a ser diminuida de papel
 
-    double qnt_tempo = 65.00;                                                                                                    //Definindo o tempo da fase
+    double qnt_tempo;                                                                                                    //Definindo o tempo da fase
+    double qnt_bonus_tempo = 0;                                                                                          //Quantidade a ser somanda de tempo
 
     bool col_mouse_caixa = false;                                                                                        //Criando a variável para a colisão
     bool fase_delay_fim = false;                                                                                         //Variável que controla o fim do delay inicial da fase
@@ -68,7 +74,7 @@ int main(void)
     } Upgrade;
 
     Upgrade upgrade[3];                                                                                                 //Vetor de structs que armazena os upgrade
-#pragma region Upgrade Valores                                                                                                     //Criação dos upgrades
+    #pragma region Upgrade Valores                                                                                                     //Criação dos upgrades
     upgrade[0].tamanho.x = 20;
     upgrade[0].tamanho.y = 120;
     upgrade[0].tamanho.width = 150;
@@ -92,7 +98,48 @@ int main(void)
     upgrade[2].id = 3;
     upgrade[2].cor = GREEN;
     upgrade[2].descricao = "Redução Papel";
-#pragma endregion Upgrades
+    #pragma endregion Upgrade
+
+    typedef struct {
+        int papel;
+        double tempo;
+    } Fase;
+
+    Fase fase[11];
+    #pragma region Fase Valores                                                                                                        //Criação das fases
+    fase[0].papel = 0;
+    fase[0].tempo = 0;
+
+    fase[1].papel = 30;
+    fase[1].tempo = 40;
+
+    fase[2].papel = 60;
+    fase[2].tempo = 30;
+
+    fase[3].papel = 60;
+    fase[3].tempo = 30;
+
+    fase[4].papel = 90;
+    fase[4].tempo = 45;
+
+    fase[5].papel = 130;
+    fase[5].tempo = 60;
+
+    fase[6].papel = 160;
+    fase[6].tempo = 70;
+
+    fase[7].papel = 190;
+    fase[7].tempo = 85;
+
+    fase[8].papel = 220;
+    fase[8].tempo = 90;
+
+    fase[9].papel = 270;
+    fase[9].tempo = 100;
+
+    fase[10].papel = 300;
+    fase[10].tempo = 120;
+    #pragma endregion Fase
 
     Rectangle caixaPapeis = { 20, 15, 100, 120 };                                                    //Criando os valores da caixa de papéis
     Color caixaPapeisCor = GOLD;                                                                                         //Definindo a cor da caixa
@@ -101,11 +148,9 @@ int main(void)
     SetTargetFPS(60);                                                                                                //Definindo a quantidade de frames por segundo
     //--------------------------------------------------------------------------------------
 
-    int val_desc_papel = 1;
-    double qnt_bonus_tempo = 0;
-    int qnt_bonus_papel = 0;
-    double qnt_fase_tempo;
-    int qnt_fase_papel;
+
+
+
 
 
     // Início Jogo
@@ -119,9 +164,9 @@ int main(void)
 
                 if(qnt_cont_frames > 120)
                 {
-                    qnt_cont_frames = 0;                //Resetando a contagem de frames para ser reutilizada
-                    fase_nivel = 1;                     //Definindo o nível padrão
-                    fase_delay_fim = false;             //Resetando a variável do delay para que haja o delay corretamente
+                    qnt_cont_frames = 0;                                    //Resetando a contagem de frames para ser reutilizada
+                    fase_nivel = 1;                                         //Definindo o nível padrão
+                    fase_delay_fim = false;                                 //Resetando a variável do delay para que haja o delay corretamente
                     telaAtual = DELAY;
                 }
 
@@ -129,22 +174,22 @@ int main(void)
 
             case UPGRADE:
             {
-                upg_escolha = 0;                //Definindo para a escolha inicial ser sempre nula
+                upg_escolha = 0;                                                                               //Definindo para a escolha inicial ser sempre nula
 
-                if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))                                  //Detectando o botão esquerdo do mouse
+                if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))                                             //Detectando o botão esquerdo do mouse
                 {
-                    Vector2 GetMouse = GetMousePosition();                                                  //Capturando os valores de x e y do mouse
+                    Vector2 GetMouse = GetMousePosition();                                                     //Capturando os valores de x e y do mouse
 
-                    for(int i = 0; i <= 2; i++)                                                     //Lendo as posições das opções de upgrade
+                    for(int i = 0; i <= 2; i++)                                                                //Lendo as posições das opções de upgrade
                     {
-                        if(CheckCollisionPointRec(GetMouse, upgrade[i].tamanho))                //Checando se a posição do mouse "colide" com algum upgrade
+                        if(CheckCollisionPointRec(GetMouse, upgrade[i].tamanho))                     //Checando se a posição do mouse "colide" com algum upgrade
                         {
-                            upg_escolha = upgrade[i].id;                                                        //Atribuindo o id do upgrade para futura execução
+                            upg_escolha = upgrade[i].id;                                                       //Atribuindo o id do upgrade para futura execução
                         }
                     }
                 }
 
-                switch (upg_escolha) {                                          //Com base na escolha do upgrade um conjunto de tarefas será executado
+                switch (upg_escolha) {                                                                          //Com base na escolha do upgrade um conjunto de tarefas será executado
                     case 1:{
                         printf("O escolhido foi o upgrade 1!\n");
 
@@ -179,15 +224,12 @@ int main(void)
                 qnt_cont_frames++;
 
 
-                if(fase_delay_fim)                  //Variável atualizada no segundo DELAY switch
+                if(fase_delay_fim)                                                               //Variável atualizada no segundo DELAY switch
                 {
-                    qnt_cont_frames = 0;                                //Resetando a contagem de frames para ser reutilizada
-                    qnt_tempo = (qnt_tempo - 5) + qnt_bonus_tempo;                //Definindo a quantidade de tempo da fase
-                    qnt_papel = (qnt_papel + 10) - qnt_bonus_papel;                   //Definindo a quantidade de papel total da fase
+                    qnt_cont_frames = 0;                                                         //Resetando a contagem de frames para ser reutilizada
+                    qnt_tempo = fase[fase_nivel].tempo + qnt_bonus_tempo;                        //Definindo a quantidade de tempo da fase
+                    qnt_papel = fase[fase_nivel].papel - qnt_bonus_papel;                        //Definindo a quantidade de papel total da fase
 
-
-                    qnt_fase_tempo = qnt_tempo;
-                    qnt_fase_papel = qnt_papel;
 
                     printf("Clique: %d\n", val_desc_papel);             //Teste Clique
                     printf("Tempo: %.2f\n", qnt_tempo);                 //Teste Tempo
@@ -199,18 +241,18 @@ int main(void)
                 }
 
 
-                fase_delay_fim = false;             //Atualizando a variável do delay para poder ser executado em outra chamada
+                fase_delay_fim = false;                                                           //Atualizando a variável do delay para poder ser executado em outra chamada
 
             }break;
 
             case FASE:
             {
-                if (qnt_fase_tempo > 0.1)                //Verificando se ainda há tempo na fase para habilitar a colisão com os papéis
+                if (qnt_tempo > 0.1)                                                                                    //Verificando se ainda há tempo na fase para habilitar a colisão com os papéis
                 {
-                    qnt_fase_tempo -= 0.1;
+                    qnt_tempo -= 0.1;
 
 
-                    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))            //Detectando se o botão esquerdo foi pressionado
+                    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))                                                  //Detectando se o botão esquerdo foi pressionado
                     {
                         Vector2 GetMouse = GetMousePosition();                                                           //Capturando as posições de X e Y do mouse
                         DrawText("FUNCIONOU !", GetMouse.x, GetMouse.y, 20, GOLD);         //Confirmação da captura (Apenas para teste)
@@ -218,10 +260,10 @@ int main(void)
                     }
 
 
-                    if(col_mouse_caixa)             //Contando ponto caso a colisão com a caixa exista
+                    if(col_mouse_caixa)                                                                                 //Contando ponto caso a colisão com a caixa exista
                     {
-                        qnt_fase_papel -= val_desc_papel;                     //Descontando um do total de papéis
-                        col_mouse_caixa = false;            //Tonando falsa para evitar um bug no loop
+                        qnt_papel -= val_desc_papel;                                                                    //Descontando um do total de papéis
+                        col_mouse_caixa = false;                                                                        //Tonando falsa para evitar um bug no loop
                     }
 
                 }
@@ -235,20 +277,20 @@ int main(void)
         ClearBackground(RAYWHITE);                       //Desenhando o fundo
 
 
-        switch (telaAtual) {                //Fluxo de Desenho das Telas do Jogo
+        switch (telaAtual) {                  //Fluxo de Desenho das Telas do Jogo
             case MENU:
             {
-                DrawText("Começando o Jogo...", GetScreenWidth() / 2, GetScreenHeight() / 2, 40, LIGHTGRAY);            //Desenhando detalhes do Menu
+                DrawText("Começando o Jogo...", GetScreenWidth() / 2, GetScreenHeight() / 2, 40, LIGHTGRAY);                                   //Desenhando detalhes do Menu
 
             }break;
 
             case UPGRADE:
             {
-                DrawText("Tela de Upgrade", GetScreenWidth() / 2 + 80, GetScreenHeight() / 2 + 130, 30, LIGHTGRAY);           //Título da tela de Upgrades
+                DrawText("Tela de Upgrade", GetScreenWidth() / 2 + 80, GetScreenHeight() / 2 + 130, 30, LIGHTGRAY);                             //Título da tela de Upgrades
 
-                for(int i = 0; i <= 2; i++)                                                 //Expondo os upgrades disponíveis
+                for(int i = 0; i <= 2; i++)                                                                                                                                   //Expondo os upgrades disponíveis
                 {
-                    DrawRectangleRec(upgrade[i].tamanho, upgrade[i].cor);               //Desenhando os upgrades
+                    DrawRectangleRec(upgrade[i].tamanho, upgrade[i].cor);                                                                                           //Desenhando os upgrades
                     DrawText(TextFormat("%s", upgrade[i].descricao), upgrade[i].tamanho.x + 25, upgrade[i].tamanho.y + 80, 15, WHITE);
                 }
 
@@ -259,48 +301,56 @@ int main(void)
                 DrawText(TextFormat("Fase %d", fase_nivel), GetScreenWidth() / 2 - 40, GetScreenHeight() / 2 - 200, 30, LIGHTGRAY);         //Desenhando o nível atual
 
 
-                if(qnt_cont_frames <= 60)                       //Atualiza com base na contagem de frames (qnt_cont_frames)
+                if(qnt_cont_frames <= 60)                                                                                                                                      //Atualiza com base na contagem de frames (qnt_cont_frames)
                 {
-                    fase_delay = 3;                                 //Puxa o quarto valor da lista fase_delay_val("3")
+                    fase_delay = 3;                                                                                                                                            //Puxa o quarto valor da lista fase_delay_val("3")
                 }
                 else if(qnt_cont_frames <= 120)
                 {
-                    fase_delay = 2;                                 //Puxa o terceiro valor da lista fase_delay_val("2")
+                    fase_delay = 2;                                                                                                                                            //Puxa o terceiro valor da lista fase_delay_val("2")
                 }
                 else if(qnt_cont_frames <= 180)
                 {
-                    fase_delay = 1;                                 //Puxa o segundo valor da lista fase_delay_val("1")
+                    fase_delay = 1;                                                                                                                                            //Puxa o segundo valor da lista fase_delay_val("1")
                 }
                 else
                 {
-                    fase_delay_fim = true;                      //Atualizando o valor da variável para encerrar o delay
-                    fase_delay = 0;                             //Puxa o primeiro valor da lista fase_delay_val("")
-                    DrawText("Clique nos Papéis!!!", GetScreenWidth() / 2 - 120, GetScreenHeight() / 2, 30, LIGHTGRAY);         //Desenhando a mensagem final da contagem
+                    fase_delay_fim = true;                                                                                                                                     //Atualizando o valor da variável para encerrar o delay
+                    fase_delay = 0;                                                                                                                                            //Puxa o primeiro valor da lista fase_delay_val("")
+                    DrawText("Clique nos Papéis!!!", GetScreenWidth() / 2 - 120, GetScreenHeight() / 2, 30, LIGHTGRAY);                          //Desenhando a mensagem final da contagem
                 }
 
 
-                DrawText(TextFormat("%s...", fase_delay_val[fase_delay]), GetScreenWidth() / 2, GetScreenHeight() / 2, 30, LIGHTGRAY);      //Desenhando a contagem
+                DrawText(TextFormat("%s...", fase_delay_val[fase_delay]), GetScreenWidth() / 2, GetScreenHeight() / 2, 30, LIGHTGRAY);       //Desenhando a contagem
 
             }break;
 
             case FASE:
             {
-                DrawRectangleRec(caixaPapeis, caixaPapeisCor);              //Desenhando a caixa de Papéis
+                DrawRectangleRec(caixaPapeis, caixaPapeisCor);                                                                              //Desenhando a caixa de Papéis
 
-                DrawText(TextFormat("%.2f", qnt_fase_tempo), GetScreenWidth() / 2, 20, 20, LIGHTGRAY);                   //Desenhando o tempo
-                DrawText(TextFormat("Papéis: %d",qnt_fase_papel), (GetScreenWidth() / 2) + 200, 20, 20, LIGHTGRAY);      //Desenhanto a quantidade de papel
+                DrawText(TextFormat("%.2f", qnt_tempo), GetScreenWidth() / 2, 20, 20, LIGHTGRAY);                   //Desenhando o tempo
+                DrawText(TextFormat("Papéis: %d",qnt_papel), (GetScreenWidth() / 2) + 200, 20, 20, LIGHTGRAY);      //Desenhanto a quantidade de papel
 
 
-                if((qnt_fase_tempo < 0.1) && (qnt_fase_papel > 0)){           //Desenhando a Derrota
-                    telaAtual = MENU;
+                if((qnt_tempo < 0.1) && (qnt_papel > 0)){                                                                                             //Desenhando a Derrota
+                    if(fase_nivel == 1)
+                    {
+                        fase_nivel = 1;
+                    }
+                    else
+                    {
+                        fase_nivel -= 1;
+                    }
+                    telaAtual = UPGRADE;
                     BeginDrawing();
                     DrawText("Perdeu!!!", GetScreenWidth() / 2 - 60, GetScreenHeight() / 2, 30, LIGHTGRAY);
                     EndDrawing();
                     WaitTime(2);
                 }
-                else if ((qnt_fase_tempo > 0.1) && (qnt_fase_papel <= 0))     //Desenhando a Vitória
+                else if ((qnt_tempo > 0.1) && (qnt_papel <= 0))                                                                                         //Desenhando a Vitória
                 {
-                    fase_nivel += 1;                                    //Aumentando o nível
+                    fase_nivel += 1;                                                                                                                    //Aumentando o nível
                     telaAtual = UPGRADE;
                     BeginDrawing();
                     DrawText("Ganhou!!!", GetScreenWidth() / 2 - 60, GetScreenHeight() / 2, 30, LIGHTGRAY);
