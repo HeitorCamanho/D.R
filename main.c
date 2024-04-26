@@ -19,6 +19,7 @@
  * fase_delay_val (char[4][2]) -> Guarda os valores que serão exibidos na contagem do delay;
  * fase_delay_fim (bool) -> Controla se o fim do delay já chegou ou não;
  * fase_nivel (int) -> Controla qual o nível atual;
+ * fase_vida (int) -> Controla a quantidade de vidas do jogador
  * upg_escolha (int) -> Guarda o id do upgrade para a execução das suas instruções;
  * telaAtual (telaJogo) -> Define a fase atual;
  *                  |Controladoras|
@@ -51,6 +52,7 @@ int main(void)
     int qnt_cont_frames = 0;                                                                                             //Definindo uma variável contadora (vantagem em relação ao Wait é que com ela podemos encerrar a aplicação a qualquer momento)
     int fase_delay;                                                                                                      //Tempo de delay inicial da fase
     int fase_nivel;                                                                                                      //Definindo o nível
+    int fase_vida;                                                                                                       //Definindo a quantidade de vidas
     int upg_escolha;                                                                                                     //Guarda o id do upgrade escolhido
     int val_desc_papel = 1;                                                                                              //Quantidade de papel descontado a cada clique
     int qnt_bonus_papel = 0;                                                                                             //Quantidade a ser diminuida de papel
@@ -81,7 +83,7 @@ int main(void)
     upgrade[0].tamanho.height = 225;
     upgrade[0].id = 1;
     upgrade[0].cor = GOLD;
-    upgrade[0].descricao = "Clique Duplo";
+    upgrade[0].descricao = "+1 Clique";
 
     upgrade[1].tamanho.x = 200;
     upgrade[1].tamanho.y = 120;
@@ -105,40 +107,25 @@ int main(void)
         double tempo;
     } Fase;
 
-    Fase fase[11];
+    Fase fase[6];
     #pragma region Fase Valores                                                                                                        //Criação das fases
     fase[0].papel = 0;
     fase[0].tempo = 0;
 
-    fase[1].papel = 30;
-    fase[1].tempo = 40;
+    fase[1].papel = 20;
+    fase[1].tempo = 30;
 
-    fase[2].papel = 60;
-    fase[2].tempo = 30;
+    fase[2].papel = 80;
+    fase[2].tempo = 40;
 
-    fase[3].papel = 60;
-    fase[3].tempo = 30;
+    fase[3].papel = 200;
+    fase[3].tempo = 50;
 
-    fase[4].papel = 90;
-    fase[4].tempo = 45;
+    fase[4].papel = 300;
+    fase[4].tempo = 60;
 
-    fase[5].papel = 130;
-    fase[5].tempo = 60;
-
-    fase[6].papel = 160;
-    fase[6].tempo = 70;
-
-    fase[7].papel = 190;
-    fase[7].tempo = 85;
-
-    fase[8].papel = 220;
-    fase[8].tempo = 90;
-
-    fase[9].papel = 270;
-    fase[9].tempo = 100;
-
-    fase[10].papel = 300;
-    fase[10].tempo = 120;
+    fase[5].papel = 500;
+    fase[5].tempo = 70;
     #pragma endregion Fase
 
     Rectangle caixaPapeis = { 20, 15, 100, 120 };                                                    //Criando os valores da caixa de papéis
@@ -165,7 +152,11 @@ int main(void)
                 if(qnt_cont_frames > 120)
                 {
                     qnt_cont_frames = 0;                                    //Resetando a contagem de frames para ser reutilizada
+                    fase_vida = 3;                                          //Definindo a quantidade de vida
                     fase_nivel = 1;                                         //Definindo o nível padrão
+                    qnt_bonus_tempo = 0;                                    //Zerando o tempo bônus
+                    qnt_bonus_papel = 0;                                    //Zerando o papel bônus
+                    val_desc_papel = 1;                                     //Definindo o desconto de cada clique do mouse
                     fase_delay_fim = false;                                 //Resetando a variável do delay para que haja o delay corretamente
                     telaAtual = DELAY;
                 }
@@ -193,7 +184,7 @@ int main(void)
                     case 1:{
                         printf("O escolhido foi o upgrade 1!\n");
 
-                        val_desc_papel *= 2;
+                        val_desc_papel += 1;
                         telaAtual = DELAY;
                     }break;
 
@@ -229,6 +220,11 @@ int main(void)
                     qnt_cont_frames = 0;                                                         //Resetando a contagem de frames para ser reutilizada
                     qnt_tempo = fase[fase_nivel].tempo + qnt_bonus_tempo;                        //Definindo a quantidade de tempo da fase
                     qnt_papel = fase[fase_nivel].papel - qnt_bonus_papel;                        //Definindo a quantidade de papel total da fase
+
+                    if(val_desc_papel > 5)                                                       //Limitando o bônus do clique para 5
+                    {
+                        val_desc_papel = 5;
+                    }
 
 
                     printf("Clique: %d\n", val_desc_papel);             //Teste Clique
@@ -300,6 +296,8 @@ int main(void)
             {
                 DrawText(TextFormat("Fase %d", fase_nivel), GetScreenWidth() / 2 - 40, GetScreenHeight() / 2 - 200, 30, LIGHTGRAY);         //Desenhando o nível atual
 
+                DrawText(TextFormat("Vidas: %d", fase_vida), GetScreenWidth() / 2 - 40, GetScreenHeight() / 2 + 200, 30, LIGHTGRAY);        //Desenhando as vidas
+
 
                 if(qnt_cont_frames <= 60)                                                                                                                                      //Atualiza com base na contagem de frames (qnt_cont_frames)
                 {
@@ -334,15 +332,29 @@ int main(void)
 
 
                 if((qnt_tempo < 0.1) && (qnt_papel > 0)){                                                                                             //Desenhando a Derrota
-                    if(fase_nivel == 1)
+                    fase_vida -= 1;                                                                                                                   //Diminuindo a vida em um
+
+
+                    if(fase_nivel == 1)                                                                                                               //Impedindo a fase 0
                     {
                         fase_nivel = 1;
                     }
-                    else
+                    /*else                                                                                                                            //Retornando para a fase anterior
                     {
                         fase_nivel -= 1;
+                    }*/
+
+
+                    if(fase_vida < 0)                                                                                                                 //Limite de vidas atingido
+                    {
+                        telaAtual = MENU;
                     }
-                    telaAtual = UPGRADE;
+                    else                                                                                                                              //Limite de vidas não atingido
+                    {
+                        telaAtual = UPGRADE;
+                    }
+
+
                     BeginDrawing();
                     DrawText("Perdeu!!!", GetScreenWidth() / 2 - 60, GetScreenHeight() / 2, 30, LIGHTGRAY);
                     EndDrawing();
@@ -351,7 +363,18 @@ int main(void)
                 else if ((qnt_tempo > 0.1) && (qnt_papel <= 0))                                                                                         //Desenhando a Vitória
                 {
                     fase_nivel += 1;                                                                                                                    //Aumentando o nível
-                    telaAtual = UPGRADE;
+
+
+                    if(fase_nivel > 5)                                                                                                                  //Atingindo o nível máximo
+                    {
+                        telaAtual = MENU;
+                    }
+                    else                                                                                                                                //Não atingindo o nível máximo
+                    {
+                        telaAtual = UPGRADE;
+                    }
+
+
                     BeginDrawing();
                     DrawText("Ganhou!!!", GetScreenWidth() / 2 - 60, GetScreenHeight() / 2, 30, LIGHTGRAY);
                     EndDrawing();
