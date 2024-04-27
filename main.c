@@ -74,7 +74,6 @@ int main(void)
         Rectangle tamanho;
         Color cor;
     } Upgrade;
-
     Upgrade upgrade[3];                                                                                                 //Vetor de structs que armazena os upgrade
     #pragma region Upgrade Valores                                                                                                     //Criação dos upgrades
     upgrade[0].tamanho.x = 20;
@@ -106,7 +105,6 @@ int main(void)
         int papel;
         double tempo;
     } Fase;
-
     Fase fase[6];
     #pragma region Fase Valores                                                                                                        //Criação das fases
     fase[0].papel = 0;
@@ -335,11 +333,11 @@ int main(void)
                     fase_vida -= 1;                                                                                                                   //Diminuindo a vida em um
 
 
-                    if(fase_nivel == 1)                                                                                                               //Impedindo a fase 0
+                    /*if(fase_nivel == 1)                                                                                                               //Impedindo a fase 0
                     {
                         fase_nivel = 1;
                     }
-                    /*else                                                                                                                            //Retornando para a fase anterior
+                    else                                                                                                                            //Retornando para a fase anterior
                     {
                         fase_nivel -= 1;
                     }*/
