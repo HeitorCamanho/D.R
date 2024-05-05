@@ -1,6 +1,9 @@
 #include "raylib.h"
 #include <stdio.h>
+#include <math.h>
 #include <string.h>
+
+
 
 /* DICIONÁRIO DAS VARIÁVEIS
  * ----------------------
@@ -25,6 +28,11 @@
  *                  |Controladoras|
  *
  *                  |JOGO|
+ * func_tempo (int) -> função que calcula a quantidade de tempo por fase;
+ * func_qnt_tempo (int) -> armazena quantidade de tempo;
+ * func_papel (int) -> função que calcula a quantidade de papeis por fase;
+ * func_qnt_papel (int) -> armazena a quantidade de papeis;
+ * potencia (double) -> armazena o valor da potencia para ser aplicada na função;
  * qnt_papel (int) -> Define a quantidade de papéis;
  * qnt_tempo (double) -> Define a quantidade de qnt_tempo;
  * telaJogo (enum {MENU, UPGRADE, DELAY, FASE}) -> Define quais serão as telas;
@@ -41,41 +49,63 @@
  *                  |Objeto|
  * */
 
+
+const int telaLargura = 1280;
+const int telaComprimento = 720;
+
+int qnt_papel;                                                                                                           //Quantidade de papel necessário para vencer
+int qnt_cont_frames = 0;                                                                                                 //Definindo uma variável contadora (vantagem em relação ao Wait é que com ela podemos encerrar a aplicação a qualquer momento)
+int fase_delay;                                                                                                        //Tempo de delay inicial da fase
+int fase_nivel;                                                                                                      //Definindo o nível
+int fase_vida;                                                                                                       //Definindo a quantidade de vidas
+int upg_escolha;                                                                                                     //Guarda o id do upgrade escolhido
+int val_desc_papel = 1;                                                                                              //Quantidade de papel descontado a cada clique
+int qnt_bonus_papel = 0;                                                                                             //Quantidade a ser diminuida de papel
+
+double qnt_tempo;                                                                                                    //Definindo o tempo da fase
+double qnt_bonus_tempo = 0;                                                                                          //Quantidade a ser somanda de tempo
+
+bool col_mouse_caixa = false;                                                                                        //Criando a variável para a colisão
+bool fase_delay_fim = false;                                                                                         //Variável que controla o fim do delay inicial da fase
+
+char fase_delay_val [4][2] = {"", "1","2","3"};                                                      //Lista que expõe a contagem do delay inicial
+
+//Definindo a Tela atual
+
+typedef struct {                                                                                                     //Struct dos Upgrades
+    int id;
+    char* descricao;
+    Rectangle tamanho;
+    Color cor;
+} Upgrade;
+Upgrade upgrade[3];                                                                                                 //Vetor de structs que armazena os upgrade
+
+Rectangle caixaPapeis = { 20, 15, 100, 120 };                                                    //Criando os valores da caixa de papéis
+Color caixaPapeisCor = GOLD;
+
+int func_tempo()
+{
+    int func_qnt_tempo = (12 * fase_nivel) + 5;
+    return func_qnt_tempo;
+}
+
+int func_papel()
+{
+    double potencia = pow(4, fase_nivel);                                                                              // CÓDIGO COM O EXPONENCIAL
+    int func_qnt_papel =  potencia + 20;
+    return func_qnt_papel;
+}
+
+// Inicialização
+//--------------------------------------------------------------------------------------
+
+
 int main(void)
 {
-    // Inicialização
-    //--------------------------------------------------------------------------------------
-    const int telaLargura = 1280;
-    const int telaComprimento = 720;
-
-    int qnt_papel;                                                                                                       //Quantidade de papel necessário para vencer
-    int qnt_cont_frames = 0;                                                                                             //Definindo uma variável contadora (vantagem em relação ao Wait é que com ela podemos encerrar a aplicação a qualquer momento)
-    int fase_delay;                                                                                                      //Tempo de delay inicial da fase
-    int fase_nivel;                                                                                                      //Definindo o nível
-    int fase_vida;                                                                                                       //Definindo a quantidade de vidas
-    int upg_escolha;                                                                                                     //Guarda o id do upgrade escolhido
-    int val_desc_papel = 1;                                                                                              //Quantidade de papel descontado a cada clique
-    int qnt_bonus_papel = 0;                                                                                             //Quantidade a ser diminuida de papel
-
-    double qnt_tempo;                                                                                                    //Definindo o tempo da fase
-    double qnt_bonus_tempo = 0;                                                                                          //Quantidade a ser somanda de tempo
-
-    bool col_mouse_caixa = false;                                                                                        //Criando a variável para a colisão
-    bool fase_delay_fim = false;                                                                                         //Variável que controla o fim do delay inicial da fase
-
-    char fase_delay_val [4][2] = {"", "1","2","3"};                                                      //Lista que expõe a contagem do delay inicial
-
     enum telaJogo {MENU, UPGRADE, DELAY, FASE};                                                                          //Definindo as opções de Telas
-    enum telaJogo telaAtual = MENU;                                                                                      //Definindo a Tela atual
+    enum telaJogo telaAtual = MENU;
 
-    typedef struct {                                                                                                     //Struct dos Upgrades
-        int id;
-        char* descricao;
-        Rectangle tamanho;
-        Color cor;
-    } Upgrade;
-    Upgrade upgrade[3];                                                                                                 //Vetor de structs que armazena os upgrade
-    #pragma region Upgrade Valores                                                                                                     //Criação dos upgrades
+#pragma region Upgrade Valores                                                                                                     //Criação dos upgrades
     upgrade[0].tamanho.x = 20;
     upgrade[0].tamanho.y = 120;
     upgrade[0].tamanho.width = 150;
@@ -99,35 +129,9 @@ int main(void)
     upgrade[2].id = 3;
     upgrade[2].cor = GREEN;
     upgrade[2].descricao = "Redução Papel";
-    #pragma endregion Upgrade
+#pragma endregion Upgrade
 
-    typedef struct {
-        int papel;
-        double tempo;
-    } Fase;
-    Fase fase[6];
-    #pragma region Fase Valores                                                                                                        //Criação das fases
-    fase[0].papel = 0;
-    fase[0].tempo = 0;
-
-    fase[1].papel = 20;
-    fase[1].tempo = 30;
-
-    fase[2].papel = 80;
-    fase[2].tempo = 40;
-
-    fase[3].papel = 200;
-    fase[3].tempo = 50;
-
-    fase[4].papel = 300;
-    fase[4].tempo = 60;
-
-    fase[5].papel = 500;
-    fase[5].tempo = 70;
-    #pragma endregion Fase
-
-    Rectangle caixaPapeis = { 20, 15, 100, 120 };                                                    //Criando os valores da caixa de papéis
-    Color caixaPapeisCor = GOLD;                                                                                         //Definindo a cor da caixa
+    //Definindo a cor da caixa
 
     InitWindow(telaLargura, telaComprimento, "D.R:Demon's Resources");                                  //Criando a tela de Jogo
     SetTargetFPS(60);                                                                                                //Definindo a quantidade de frames por segundo
@@ -216,8 +220,16 @@ int main(void)
                 if(fase_delay_fim)                                                               //Variável atualizada no segundo DELAY switch
                 {
                     qnt_cont_frames = 0;                                                         //Resetando a contagem de frames para ser reutilizada
-                    qnt_tempo = fase[fase_nivel].tempo + qnt_bonus_tempo;                        //Definindo a quantidade de tempo da fase
-                    qnt_papel = fase[fase_nivel].papel - qnt_bonus_papel;                        //Definindo a quantidade de papel total da fase
+                    qnt_tempo = func_tempo() + qnt_bonus_tempo;                        //Definindo a quantidade de tempo da fase
+                    if (fase_nivel == 5)
+                    {
+                        qnt_papel = 500;
+
+                    }
+                    else
+                    {
+                        qnt_papel = func_papel() - qnt_bonus_papel;                        //Definindo a quantidade de papel total da fase
+                    }
 
                     if(val_desc_papel > 5)                                                       //Limitando o bônus do clique para 5
                     {
@@ -343,7 +355,7 @@ int main(void)
                     }*/
 
 
-                    if(fase_vida < 0)                                                                                                                 //Limite de vidas atingido
+                    if(fase_vida == 0)                                                                                                                 //Limite de vidas atingido
                     {
                         telaAtual = MENU;
                     }
