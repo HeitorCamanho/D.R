@@ -87,7 +87,7 @@ enum telaJogo {MENU, UPGRADE, DELAY, FASE};                                     
 #pragma region Funções Criação                                                                                                         //Criação das Funções
 int func_tempo()                                                                                                        //Função para calcular o tempo
 {
-    int func_qnt_tempo = (12 * fase_nivel) + 5;
+    int func_qnt_tempo = (12 * fase_nivel) + 15;
     return func_qnt_tempo;
 }
 
@@ -134,11 +134,15 @@ int main(void)
 
     enum telaJogo telaAtual = MENU;                                                                                     //Define a fase atual
 
-    Rectangle caixaPapeis = { 20, 15, 100, 120 };                                                   //Criando os valores da caixa de papéis
+    Rectangle caixaPapeis = { 20, 15, 150, 180 };                                                   //Criando os valores da caixa de papéis
     Color caixaPapeisCor = GOLD;                                                                                        //Define a cor da caixa
 
     InitWindow(telaLargura, telaComprimento, "D.R:Demon's Resources");                                 //Criando a tela de Jogo
     SetTargetFPS(60);                                                                                               //Definindo a quantidade de frames por segundo
+
+
+    Texture2D text_papel = LoadTexture("E:/Vitor/projetos/D.R/Modelos 2d/papel3.0.png");
+
     //--------------------------------------------------------------------------------------
 
 
@@ -147,6 +151,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
     while (!WindowShouldClose())
     {
+
         switch (telaAtual) {                                                                                            //Fluxo de Telas do Jogo
             case MENU:
             {
@@ -283,7 +288,7 @@ int main(void)
         // Início Gráfico
         //--------------------------------------------------------------------------------------
         BeginDrawing();
-        ClearBackground(RAYWHITE);                                                                                //Desenhando o fundo
+        ClearBackground(RAYWHITE);                                                                               //Desenhando o fundo
 
 
         switch (telaAtual) {                                                                                            //Fluxo de Desenho das Telas do Jogo
@@ -334,11 +339,12 @@ int main(void)
 
                 DrawText(TextFormat("%s...", fase_delay_val[fase_delay]), GetScreenWidth() / 2, GetScreenHeight() / 2, 30, LIGHTGRAY);       //Desenhando a contagem
 
+
             }break;
 
             case FASE:
             {
-                DrawRectangleRec(caixaPapeis, caixaPapeisCor);                                                                                                      //Desenhando a caixa de Papéis
+                DrawTexture(text_papel, 20,15, WHITE);                                                                                              //Desenhando a caixa de Papéis
 
                 DrawText(TextFormat("%.2f", qnt_tempo), GetScreenWidth() / 2, 20, 20, LIGHTGRAY);                                           //Desenhando o tempo
                 DrawText(TextFormat("Papéis: %d",qnt_papel), (GetScreenWidth() / 2) + 200, 20, 20, LIGHTGRAY);                              //Desenhanto a quantidade de papel
@@ -399,10 +405,12 @@ int main(void)
 
 
         EndDrawing();
+
     }
 
     // Fechamento
     //--------------------------------------------------------------------------------------
+    UnloadTexture(text_papel);
     CloseWindow();
     //--------------------------------------------------------------------------------------
 
