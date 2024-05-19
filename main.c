@@ -41,6 +41,7 @@
  *
  *                  |Objeto|
  * caixaPapeis (Rectangle) -> Define as dimensões da caixa de papéis;
+ * text_papel (Texture2D) -> Carrega o sprite dos papéis;
  * botaoJogar (Rectangle) -> Define as dimensões do botão "NOVO JOGO";
  * botaoSair (Rectangle) -> Define as dimensões do botão "SAIR;
  * Upgrade (Struct {int id, Rectangle tamanho, Color cor}) -> Armazena os atributos dos upgrades;
@@ -164,6 +165,8 @@ int main(void)
 
     InitWindow(telaLargura, telaComprimento, "D.R:Demon's Resources");                                 //Criando a tela de Jogo
     SetTargetFPS(60);                                                                                               //Definindo a quantidade de frames por segundo
+
+    Texture2D text_papel = LoadTexture("E:/Vitor/projetos/D.R/Modelos 2d/papel3.0.png");
     //--------------------------------------------------------------------------------------
 
 
@@ -193,6 +196,7 @@ int main(void)
                     }
                     else if(CheckCollisionPointRec(posMouse, botaoSair))                                      //Clicando no botão "SAIR"
                     {
+                        UnloadTexture(text_papel);                                                               //Descarregando as texturas
                         CloseWindow();                                                                                  //Fechando o jogo
                     }
                 }
@@ -373,7 +377,7 @@ int main(void)
 
             case FASE:
             {
-                DrawRectangleRec(caixaPapeis, GOLD);                                                                                                                //Desenhando a caixa de Papéis
+                DrawTexture(text_papel, 20,15, WHITE);                                                                                                  //Desenhando a caixa de Papéis
 
                 DrawText(TextFormat("%.2f", qnt_tempo), (telaLargura / 2), 20, 20, LIGHTGRAY);                                              //Desenhando o tempo
                 DrawText(TextFormat("Papéis: %d",qnt_papel), (telaLargura / 2) + 200, 20, 20, LIGHTGRAY);                                   //Desenhanto a quantidade de papel
@@ -434,7 +438,8 @@ int main(void)
 
     // Fechamento
     //--------------------------------------------------------------------------------------
-    CloseWindow();
+    UnloadTexture(text_papel);                                                                                   //Descarregando as texturas
+    CloseWindow();                                                                                                      //Fechando o jogo
     //--------------------------------------------------------------------------------------
 
     return 0;
