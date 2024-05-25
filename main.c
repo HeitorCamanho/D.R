@@ -164,10 +164,15 @@ int main(void)
 
 
     InitWindow(telaLargura, telaComprimento, "D.R:Demon's Resources");                                 //Criando a tela de Jogo
+    SetWindowIcon(LoadImage("icone jogo.png"));
     SetTargetFPS(60);                                                                                               //Definindo a quantidade de frames por segundo
 
-    Texture2D text_papel = LoadTexture("Modelos 2d/papel3.0.png");
-    Texture2D text_menu = LoadTexture("MOdelos 2d/menu.png");
+#pragma region Load Texturas
+    Texture2D text_papel = LoadTexture("Assets/Sprites/papel3.0.png");
+    Texture2D text_menu = LoadTexture("Assets/Sprites/menu.png");
+    Texture2D text_mouse = LoadTexture("Assets/Sprites/mouse.png");
+#pragma endregion Load
+
     //--------------------------------------------------------------------------------------
 
 
@@ -179,6 +184,10 @@ int main(void)
 
         // Início Código
         //--------------------------------------------------------------------------------------
+        Vector2 MouseSprite = { -100.0f, -100.0f };
+        MouseSprite = GetMousePosition();
+        HideCursor();
+
         switch (telaAtual) {                                                                                            //Fluxo de Telas do Jogo
             case MENU:
             {
@@ -199,11 +208,12 @@ int main(void)
                     {
                         UnloadTexture(text_menu);
                         UnloadTexture(text_papel);                                                               //Descarregando as texturas
+                        UnloadTexture(text_mouse);
                         CloseWindow();                                                                                  //Fechando o jogo
                     }
                 }
 
-            }
+            }break;
 
             case UPGRADE:
             {
@@ -323,13 +333,11 @@ int main(void)
         //--------------------------------------------------------------------------------------
         BeginDrawing();
         ClearBackground(RAYWHITE);                                                                                //Desenhando o fundo
-
         switch (telaAtual) {                                                                                            //Fluxo de Desenho das Telas do Jogo
             case MENU:
             {
-                DrawTexture(text_menu, 0, 0, WHITE);
-                DrawText("D.R:Demon's Resources", (telaLargura / 2) - 200, (telaComprimento / 2) - 300, 40, LIGHTGRAY);
 
+                DrawTexture(text_menu, 0, 0, WHITE);
                 DrawRectangleRec(botaoJogar, LIGHTGRAY);                                                                                                                     //Desenhando o botão de "NOVO JOGO"
                 DrawRectangleRec(botaoSair, LIGHTGRAY);                                                                                                                      //Desenhando o botão de "SAIR"
 
@@ -433,6 +441,7 @@ int main(void)
 
             }break;
         }
+        DrawTextureV(text_mouse, MouseSprite, WHITE);
 
         EndDrawing();
         //--------------------------------------------------------------------------------------
@@ -442,6 +451,8 @@ int main(void)
     // Fechamento
     //--------------------------------------------------------------------------------------
     UnloadTexture(text_papel);                                                                                   //Descarregando as texturas
+    UnloadTexture(text_menu);
+    UnloadTexture(text_mouse);
     CloseWindow();                                                                                                      //Fechando o jogo
     //--------------------------------------------------------------------------------------
 
