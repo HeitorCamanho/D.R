@@ -7,7 +7,7 @@
  * ----------------------
  *                  |Tela|
  * telaLargura (const int) -> Responsável por definir a largura da tela;
- * telaComprimento (const int) -> Responsável por definir o comprimento da tela;
+ * telaAltura (const int) -> Responsável por definir o comprimento da tela;
  *                  |Tela|
  *
  *                  |Colisão|
@@ -37,15 +37,19 @@
  * val_desc_papel (int) -> Define a quantidade de papel descontado a cada clique do jogador;
  * qnt_bonus_papel(int) -> Define a quantidade total de papel a ser descontado como bônus do upgrade;
  * qnt_bonus_tempo(double) -> Define a quantidade total de tempo a ser acrescentado como bônus do upgrade;
+ * Upgrade (Struct {int id, Rectangle tamanho, Color cor}) -> Armazena os atributos dos upgrades;
+ * upgrade (Vetor (struct Upgrade)) -> Armazena os upgrades em um vetor;
+ * Fase (Struct {int papel, double tempo}) -> Armazena os atributos das fases;
+ * fase (Vetor (struct Fase)) -> Armazena as fases em um vetor;
  *                  |JOGO|
  *
  *                  |Objeto|
  * caixaPapeis (Rectangle) -> Define as dimensões da caixa de papéis;
  * text_papel (Texture2D) -> Carrega o sprite dos papéis;
+ * text_menu (Texture2D) -> Carrega o sprite do fundo do Menu;
+ * text_mouse (Texture2D) -> Carrega o sprite do ícone do mouse;
  * botaoJogar (Rectangle) -> Define as dimensões do botão "NOVO JOGO";
  * botaoSair (Rectangle) -> Define as dimensões do botão "SAIR;
- * Upgrade (Struct {int id, Rectangle tamanho, Color cor}) -> Armazena os atributos dos upgrades;
- * upgrade (Vetor (struct Upgrade)) -> Armazena os upgrades em um vetor;
  *                  |Objeto|
  * */
 
@@ -53,7 +57,7 @@
 //--------------------------------------------------------------------------------------
 #pragma region Variáveis Criação                                                                                                       //Criação das Variáveis
 const int telaLargura = 1280;                                                                                           //Define a largura da tela
-const int telaComprimento = 720;                                                                                        //Define o comprimento da tela
+const int telaAltura = 720;                                                                                             //Define o comprimento da tela
 
 int qnt_papel;                                                                                                          //Quantidade de papel necessário para vencer
 int qnt_cont_frames = 0;                                                                                                //Definindo uma variável contadora (vantagem em relação ao Wait é que com ela podemos encerrar a aplicação a qualquer momento)
@@ -109,7 +113,7 @@ int main(void)
     // Inicialização
     //--------------------------------------------------------------------------------------
     Upgrade upgrade[3];                                                                                                 //Vetor de structs que armazena os upgrades
-    #pragma region Upgrade Valores                                                                                                     //Criação dos upgrades
+#pragma region Upgrade Valores                                                                                                     //Criação dos upgrades
     upgrade[0].tamanho.x = 20;
     upgrade[0].tamanho.y = 120;
     upgrade[0].tamanho.width = 150;
@@ -133,10 +137,10 @@ int main(void)
     upgrade[2].id = 3;
     upgrade[2].cor = GREEN;
     upgrade[2].descricao = "Redução Papel";
-    #pragma endregion Upgrade
+#pragma endregion Upgrade
 
     Fase fase[6];
-    #pragma region Fase Valores                                                                                                        //Criação das fases
+#pragma region Fase Valores                                                                                                        //Criação das fases
     fase[0].papel = 0;
     fase[0].tempo = 0;
 
@@ -154,23 +158,23 @@ int main(void)
 
     fase[5].papel = 500;
     fase[5].tempo = 70;
-    #pragma endregion Fase
+#pragma endregion Fase
 
     enum telaJogo telaAtual = MENU;                                                                                     //Define a fase atual
 
     Rectangle caixaPapeis = { 20, 15, 150, 180 };                                                   //Criando os valores da caixa de papéis
-    Rectangle botaoJogar = {(telaLargura / 2) - 100, (telaComprimento / 2), 250, 60};               //Criando os valores do botão "NOVO JOGO"
-    Rectangle botaoSair = {(telaLargura / 2) - 100, (telaComprimento / 2) + 100, 250, 60};          //Criando os valores do botão "SAIR"
+    Rectangle botaoJogar = {(telaLargura / 2) - 100, (telaAltura / 2), 250, 60};                    //Criando os valores do botão "NOVO JOGO"
+    Rectangle botaoSair = {(telaLargura / 2) - 100, (telaAltura / 2) + 100, 250, 60};               //Criando os valores do botão "SAIR"
 
 
-    InitWindow(telaLargura, telaComprimento, "D.R:Demon's Resources");                                 //Criando a tela de Jogo
-    SetWindowIcon(LoadImage("icone jogo.png"));
+    InitWindow(telaLargura, telaAltura, "D.R:Demon's Resources");                                      //Criando a tela de Jogo
+    SetWindowIcon(LoadImage("icone jogo.png"));                                                          //Carregando o ícone do arquivo
     SetTargetFPS(60);                                                                                               //Definindo a quantidade de frames por segundo
 
 #pragma region Load Texturas
-    Texture2D text_papel = LoadTexture("Assets/Sprites/papel3.0.png");
-    Texture2D text_menu = LoadTexture("Assets/Sprites/menu.png");
-    Texture2D text_mouse = LoadTexture("Assets/Sprites/mouse.png");
+    Texture2D text_papel = LoadTexture("Assets/Sprites/papel3.0.png");                                          //Carrega o sprite dos papéis
+    Texture2D text_menu = LoadTexture("Assets/Sprites/menu.png");                                               //Carrega o sprite do fundo do Menu
+    Texture2D text_mouse = LoadTexture("Assets/Sprites/mouse.png");                                             //Carrega o sprite do ícone do mouse
 #pragma endregion Load
 
     //--------------------------------------------------------------------------------------
@@ -184,9 +188,8 @@ int main(void)
 
         // Início Código
         //--------------------------------------------------------------------------------------
-        Vector2 MouseSprite = { -100.0f, -100.0f };
-        MouseSprite = GetMousePosition();
-        HideCursor();
+        Vector2 spriteMouse = GetMousePosition();                                                                       //Captura as posições do mouse para substituir pelo ícone
+        HideCursor();                                                                                                   //Esconde o cursor padrão
 
         switch (telaAtual) {                                                                                            //Fluxo de Telas do Jogo
             case MENU:
@@ -206,9 +209,9 @@ int main(void)
                     }
                     else if(CheckCollisionPointRec(posMouse, botaoSair))                                      //Clicando no botão "SAIR"
                     {
-                        UnloadTexture(text_menu);
-                        UnloadTexture(text_papel);                                                               //Descarregando as texturas
-                        UnloadTexture(text_mouse);
+                        UnloadTexture(text_papel);                                                               //Descarregando o papel
+                        UnloadTexture(text_menu);                                                                //Descarregando o fundo Menu
+                        UnloadTexture(text_mouse);                                                               //Descarregando o ícone mouse
                         CloseWindow();                                                                                  //Fechando o jogo
                     }
                 }
@@ -265,7 +268,7 @@ int main(void)
             case DELAY:
             {
                 qnt_cont_frames++;
-
+                //printf("\n%d\n", qnt_cont_frames);
                 if(fase_delay_fim)                                                                                      //Variável atualizada no segundo DELAY switch
                 {
                     qnt_cont_frames = 0;                                                                                //Resetando a contagem de frames para ser reutilizada
@@ -297,7 +300,6 @@ int main(void)
 
                     telaAtual = FASE;                                                                                   //Redirecionando para a tela Fase
                     WaitTime(2);                                                                                //Esperando dois segundos
-
                 }
 
                 fase_delay_fim = false;                                                                                 //Atualizando a variável do delay para poder ser executado em outra chamada
@@ -341,14 +343,14 @@ int main(void)
                 DrawRectangleRec(botaoJogar, LIGHTGRAY);                                                                                                                     //Desenhando o botão de "NOVO JOGO"
                 DrawRectangleRec(botaoSair, LIGHTGRAY);                                                                                                                      //Desenhando o botão de "SAIR"
 
-                DrawText("NOVO JOGO", (telaLargura / 2) - 55, (telaComprimento / 2) + 15, 30, RAYWHITE);
-                DrawText("SAIR", (telaLargura / 2) - 15, (telaComprimento / 2) + 115, 30, RAYWHITE);
+                DrawText("NOVO JOGO", (telaLargura / 2) - 55, (telaAltura / 2) + 15, 30, RAYWHITE);
+                DrawText("SAIR", (telaLargura / 2) - 15, (telaAltura / 2) + 115, 30, RAYWHITE);
 
             }break;
 
             case UPGRADE:
             {
-                DrawText("Tela de Upgrade", (telaLargura / 2 + 80), (telaComprimento / 2) + 130, 30, LIGHTGRAY);                                 //Título da tela de Upgrades
+                DrawText("Tela de Upgrade", (telaLargura / 2 + 80), (telaAltura / 2) + 130, 30, LIGHTGRAY);                                     //Título da tela de Upgrades
 
                 for(int i = 0; i <= 2; i++)                                                                                                                                   //Expondo os upgrades disponíveis
                 {
@@ -360,8 +362,8 @@ int main(void)
 
             case DELAY:
             {
-                DrawText(TextFormat("Fase %d", fase_nivel), (telaLargura / 2) - 40, (telaComprimento / 2) - 200, 30, LIGHTGRAY);             //Desenhando o nível atual
-                DrawText(TextFormat("Vidas: %d", fase_vida), (telaLargura / 2) - 40, (telaComprimento / 2) + 200, 30, LIGHTGRAY);            //Desenhando as vidas
+                DrawText(TextFormat("Fase %d", fase_nivel), (telaLargura / 2) - 40, (telaAltura / 2) - 200, 30, LIGHTGRAY);             //Desenhando o nível atual
+                DrawText(TextFormat("Vidas: %d", fase_vida), (telaLargura / 2) - 40, (telaAltura / 2) + 200, 30, LIGHTGRAY);            //Desenhando as vidas
 
                 if(qnt_cont_frames <= 60)                                                                                                                                      //Atualiza com base na contagem de frames (qnt_cont_frames)
                 {
@@ -379,10 +381,10 @@ int main(void)
                 {
                     fase_delay_fim = true;                                                                                                                                     //Atualizando o valor da variável para encerrar o delay
                     fase_delay = 0;                                                                                                                                            //Puxa o primeiro valor da lista fase_delay_val("")
-                    DrawText("Clique nos Papéis!!!", (telaLargura / 2) - 120, (telaComprimento / 2), 30, LIGHTGRAY);                             //Desenhando a mensagem final da contagem
+                    DrawText("Clique nos Papéis!!!", (telaLargura / 2) - 120, (telaAltura / 2), 30, LIGHTGRAY);                             //Desenhando a mensagem final da contagem
                 }
 
-                DrawText(TextFormat("%s...", fase_delay_val[fase_delay]), (telaLargura / 2), (telaComprimento / 2), 30, LIGHTGRAY);          //Desenhando a contagem
+                DrawText(TextFormat("%s...", fase_delay_val[fase_delay]), (telaLargura / 2), (telaAltura / 2), 30, LIGHTGRAY);          //Desenhando a contagem
 
             }break;
 
@@ -416,7 +418,7 @@ int main(void)
                     }
 
                     BeginDrawing();
-                    DrawText("Perdeu!!!", (telaLargura / 2) - 60, (telaComprimento / 2), 30, LIGHTGRAY);
+                    DrawText("Perdeu!!!", (telaLargura / 2) - 60, (telaAltura / 2), 30, LIGHTGRAY);
                     EndDrawing();
                     WaitTime(2);
                 }
@@ -434,15 +436,15 @@ int main(void)
                     }
 
                     BeginDrawing();
-                    DrawText("Ganhou!!!", (telaLargura / 2) - 60, (telaComprimento / 2), 30, LIGHTGRAY);
+                    DrawText("Ganhou!!!", (telaLargura / 2) - 60, (telaAltura / 2), 30, LIGHTGRAY);
                     EndDrawing();
                     WaitTime(2);
                 }
 
             }break;
         }
-        DrawTextureV(text_mouse, MouseSprite, WHITE);
 
+        DrawTexture(text_mouse, spriteMouse.x - 10, spriteMouse.y - 10, WHITE);                  //Desenhando o ícone na atual posição do mouse
         EndDrawing();
         //--------------------------------------------------------------------------------------
     }
@@ -450,9 +452,9 @@ int main(void)
 
     // Fechamento
     //--------------------------------------------------------------------------------------
-    UnloadTexture(text_papel);                                                                                   //Descarregando as texturas
-    UnloadTexture(text_menu);
-    UnloadTexture(text_mouse);
+    UnloadTexture(text_papel);                                                                                   //Descarregando o papel
+    UnloadTexture(text_menu);                                                                                    //Descarregando o fundo Menu
+    UnloadTexture(text_mouse);                                                                                   //Descarregando o ícone mouse
     CloseWindow();                                                                                                      //Fechando o jogo
     //--------------------------------------------------------------------------------------
 
