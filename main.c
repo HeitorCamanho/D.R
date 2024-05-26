@@ -268,7 +268,7 @@ int main(void)
             case DELAY:
             {
                 qnt_cont_frames++;
-                //printf("\n%d\n", qnt_cont_frames);
+
                 if(fase_delay_fim)                                                                                      //Variável atualizada no segundo DELAY switch
                 {
                     qnt_cont_frames = 0;                                                                                //Resetando a contagem de frames para ser reutilizada
@@ -297,9 +297,7 @@ int main(void)
                     printf("Papel: %d\n", qnt_papel);                   //Teste Papel
                     printf("Tempo: %.2f\n", qnt_tempo);                 //Teste Tempo
 
-
                     telaAtual = FASE;                                                                                   //Redirecionando para a tela Fase
-                    WaitTime(2);                                                                                //Esperando dois segundos
                 }
 
                 fase_delay_fim = false;                                                                                 //Atualizando a variável do delay para poder ser executado em outra chamada
@@ -377,11 +375,14 @@ int main(void)
                 {
                     fase_delay = 1;                                                                                                                                            //Puxa o segundo valor da lista fase_delay_val("1")
                 }
+                else if(qnt_cont_frames <= 300)
+                {
+                    fase_delay = 0;                                                                                                                                       //Puxa o primeiro valor da lista fase_delay_val("")
+                    DrawText("Clique nos Papéis!!!", (telaLargura / 2) - 120, (telaAltura / 2), 30, LIGHTGRAY);                             //Desenhando a mensagem final da contagem
+                }
                 else
                 {
-                    fase_delay_fim = true;                                                                                                                                     //Atualizando o valor da variável para encerrar o delay
-                    fase_delay = 0;                                                                                                                                            //Puxa o primeiro valor da lista fase_delay_val("")
-                    DrawText("Clique nos Papéis!!!", (telaLargura / 2) - 120, (telaAltura / 2), 30, LIGHTGRAY);                             //Desenhando a mensagem final da contagem
+                    fase_delay_fim = true;                                                                                                                                  //Encerra o loop do delay
                 }
 
                 DrawText(TextFormat("%s...", fase_delay_val[fase_delay]), (telaLargura / 2), (telaAltura / 2), 30, LIGHTGRAY);          //Desenhando a contagem
