@@ -89,6 +89,8 @@ typedef struct {
 } Fase;
 
 enum telaJogo {MENU, UPGRADE, DELAY, FASE};                                                                             //Definindo as opções de Telas
+
+Color cor_up = (Color){0,0,0,128};
 #pragma endregion Variáveis
 
 #pragma region Funções Criação                                                                                                         //Criação das Funções
@@ -175,7 +177,10 @@ int main(void)
     Texture2D text_papel = LoadTexture("Assets/Sprites/papel3.0.png");                                          //Carrega o sprite dos papéis
     Texture2D text_menu = LoadTexture("Assets/Sprites/menu.png");                                               //Carrega o sprite do fundo do Menu
     Texture2D text_mouse = LoadTexture("Assets/Sprites/mouse.png");                                             //Carrega o sprite do ícone do mouse
+    Image text_icon = LoadImage("icone-jogo.png");
 #pragma endregion Load
+
+    SetWindowIcon(text_icon);
 
     //--------------------------------------------------------------------------------------
 
@@ -355,6 +360,7 @@ int main(void)
                     DrawRectangleRec(upgrade[i].tamanho, upgrade[i].cor);                                                                                           //Desenhando os upgrades
                     DrawText(TextFormat("%s", upgrade[i].descricao), upgrade[i].tamanho.x + 25, upgrade[i].tamanho.y + 80, 15, WHITE);
                 }
+                DrawRectangle(0,0,telaLargura,telaAltura,cor_up);
 
             }break;
 
@@ -456,6 +462,7 @@ int main(void)
     UnloadTexture(text_papel);                                                                                   //Descarregando o papel
     UnloadTexture(text_menu);                                                                                    //Descarregando o fundo Menu
     UnloadTexture(text_mouse);                                                                                   //Descarregando o ícone mouse
+    UnloadImage(text_icon);
     CloseWindow();                                                                                                      //Fechando o jogo
     //--------------------------------------------------------------------------------------
 
