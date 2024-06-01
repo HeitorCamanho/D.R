@@ -73,6 +73,7 @@ double qnt_bonus_tempo = 0;                                                     
 
 bool col_mouse_caixa = false;                                                                                           //Criando a variável para a colisão
 bool fase_delay_fim = false;                                                                                            //Variável que controla o fim do delay inicial da fase
+bool ver_mouse = false;
 
 char fase_delay_val [4][2] = {"", "1","2","3"};                                                         //Lista que expõe a contagem do delay inicial
 
@@ -108,7 +109,6 @@ int func_papel()                                                                
 }
 #pragma endregion Funções
 //--------------------------------------------------------------------------------------
-
 
 int main(void)
 {
@@ -167,7 +167,10 @@ int main(void)
     Rectangle caixaPapeis = { 20, 15, 150, 180 };                                                   //Criando os valores da caixa de papéis
     Rectangle botaoJogar = {(telaLargura / 2) - 100, (telaAltura / 2), 250, 60};                    //Criando os valores do botão "NOVO JOGO"
     Rectangle botaoSair = {(telaLargura / 2) - 100, (telaAltura / 2) + 100, 250, 60};               //Criando os valores do botão "SAIR"
-
+    Rectangle verf_x1 = {0,0, telaLargura, 5};
+    Rectangle verf_y1 = {0, 0, 5, telaAltura};
+    Rectangle verf_x2 = {0,719, telaLargura , 1};
+    Rectangle verf_y2 = {1279,0, 1,telaAltura};
 
     InitWindow(telaLargura, telaAltura, "D.R:Demon's Resources");                                      //Criando a tela de Jogo
     SetWindowIcon(LoadImage("icone jogo.png"));                                                          //Carregando o ícone do arquivo
@@ -188,9 +191,7 @@ int main(void)
 
     // Início Jogo
     //--------------------------------------------------------------------------------------
-    while (!WindowShouldClose())
-    {
-
+    while (!WindowShouldClose()) {
         // Início Código
         //--------------------------------------------------------------------------------------
         Vector2 spriteMouse = GetMousePosition();                                                                       //Captura as posições do mouse para substituir pelo ícone
@@ -338,6 +339,7 @@ int main(void)
         //--------------------------------------------------------------------------------------
         BeginDrawing();
         ClearBackground(RAYWHITE);                                                                                //Desenhando o fundo
+
         switch (telaAtual) {                                                                                            //Fluxo de Desenho das Telas do Jogo
             case MENU:
             {
@@ -397,8 +399,8 @@ int main(void)
 
             case FASE:
             {
+                DrawRectangle(15,10,160,190,BLACK);
                 DrawTexture(text_papel, 20,15, WHITE);                                                                                                  //Desenhando a caixa de Papéis
-
                 DrawText(TextFormat("%.2f", qnt_tempo), (telaLargura / 2), 20, 20, LIGHTGRAY);                                              //Desenhando o tempo
                 DrawText(TextFormat("Papéis: %d",qnt_papel), (telaLargura / 2) + 200, 20, 20, LIGHTGRAY);                                   //Desenhanto a quantidade de papel
 
@@ -451,7 +453,24 @@ int main(void)
             }break;
         }
 
-        DrawTexture(text_mouse, spriteMouse.x - 10, spriteMouse.y - 10, WHITE);                  //Desenhando o ícone na atual posição do mouse
+        DrawRectangleRec(verf_x1,BLACK);
+        DrawRectangleRec(verf_y1,BLACK);
+        DrawRectangleRec(verf_x2,BLACK);
+        DrawRectangleRec(verf_y2,BLACK);
+
+
+        if (CheckCollisionPointRec(spriteMouse,verf_x1)|| CheckCollisionPointRec(spriteMouse,verf_y1) || CheckCollisionPointRec(spriteMouse,verf_x2) || CheckCollisionPointRec(spriteMouse,verf_y2) && (ver_mouse == false))
+        {
+            UnloadTexture(text_mouse);
+            ver_mouse = true;
+        }
+        else
+        {
+            DrawTexture(text_mouse, spriteMouse.x - 10, spriteMouse.y - 10, WHITE);                  //Desenhando o ícone na atual posição do mouse
+            ver_mouse = false;
+        }
+
+
         EndDrawing();
         //--------------------------------------------------------------------------------------
     }
