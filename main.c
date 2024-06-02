@@ -92,6 +92,7 @@ typedef struct {
 enum telaJogo {MENU, UPGRADE, DELAY, FASE};                                                                             //Definindo as opções de Telas
 
 Color cor_up = (Color){0,0,0,128};
+Color trasparente = (Color){0,0,0,0};
 #pragma endregion Variáveis
 
 #pragma region Funções Criação                                                                                                         //Criação das Funções
@@ -167,10 +168,10 @@ int main(void)
     Rectangle caixaPapeis = { 20, 15, 150, 180 };                                                   //Criando os valores da caixa de papéis
     Rectangle botaoJogar = {(telaLargura / 2) - 100, (telaAltura / 2), 250, 60};                    //Criando os valores do botão "NOVO JOGO"
     Rectangle botaoSair = {(telaLargura / 2) - 100, (telaAltura / 2) + 100, 250, 60};               //Criando os valores do botão "SAIR"
-    Rectangle verf_x1 = {0,0, telaLargura, 5};
+    /*Rectangle verf_x1 = {0,0, telaLargura, 5};
     Rectangle verf_y1 = {0, 0, 5, telaAltura};
     Rectangle verf_x2 = {0,719, telaLargura , 1};
-    Rectangle verf_y2 = {1279,0, 1,telaAltura};
+    Rectangle verf_y2 = {1279,0, 1,telaAltura}; */
 
     InitWindow(telaLargura, telaAltura, "D.R:Demon's Resources");                                      //Criando a tela de Jogo
     SetWindowIcon(LoadImage("icone jogo.png"));                                                          //Carregando o ícone do arquivo
@@ -180,6 +181,8 @@ int main(void)
     Texture2D text_papel = LoadTexture("Assets/Sprites/papel3.0.png");                                          //Carrega o sprite dos papéis
     Texture2D text_menu = LoadTexture("Assets/Sprites/menu.png");                                               //Carrega o sprite do fundo do Menu
     Texture2D text_mouse = LoadTexture("Assets/Sprites/mouse.png");                                             //Carrega o sprite do ícone do mouse
+    Texture2D text_mouse_2 = LoadTexture("Assets/Sprites/mouse-clique.png");
+    Texture2D tex_escritorio = LoadTexture("Assets/Sprites/escritorio.png");
     Image text_icon = LoadImage("icone-jogo.png");
 #pragma endregion Load
 
@@ -343,7 +346,6 @@ int main(void)
         switch (telaAtual) {                                                                                            //Fluxo de Desenho das Telas do Jogo
             case MENU:
             {
-
                 DrawTexture(text_menu, 0, 0, WHITE);
                 DrawRectangleRec(botaoJogar, LIGHTGRAY);                                                                                                                     //Desenhando o botão de "NOVO JOGO"
                 DrawRectangleRec(botaoSair, LIGHTGRAY);                                                                                                                      //Desenhando o botão de "SAIR"
@@ -399,6 +401,7 @@ int main(void)
 
             case FASE:
             {
+                DrawTexture(tex_escritorio,0,0, WHITE);
                 DrawRectangle(15,10,160,190,BLACK);
                 DrawTexture(text_papel, 20,15, WHITE);                                                                                                  //Desenhando a caixa de Papéis
                 DrawText(TextFormat("%.2f", qnt_tempo), (telaLargura / 2), 20, 20, LIGHTGRAY);                                              //Desenhando o tempo
@@ -453,7 +456,7 @@ int main(void)
             }break;
         }
 
-        DrawRectangleRec(verf_x1,BLACK);
+        /*DrawRectangleRec(verf_x1,BLACK);
         DrawRectangleRec(verf_y1,BLACK);
         DrawRectangleRec(verf_x2,BLACK);
         DrawRectangleRec(verf_y2,BLACK);
@@ -468,8 +471,20 @@ int main(void)
         {
             DrawTexture(text_mouse, spriteMouse.x - 10, spriteMouse.y - 10, WHITE);                  //Desenhando o ícone na atual posição do mouse
             ver_mouse = false;
-        }
+        }*/
 
+        DrawTexture(text_mouse, spriteMouse.x - 10, spriteMouse.y - 10, WHITE);                  //Desenhando o ícone na atual posição do mouse
+        if(IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+        {
+            UnloadTexture(text_mouse);
+            DrawTexture(text_mouse_2, spriteMouse.x - 10, spriteMouse.y - 10, WHITE);
+            if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+            {
+                UnloadTexture(text_mouse_2);
+                DrawTexture(text_mouse, spriteMouse.x - 10, spriteMouse.y - 10, WHITE);                  //Desenhando o ícone na atual posição do mouse
+            }
+
+        }
 
         EndDrawing();
         //--------------------------------------------------------------------------------------
@@ -482,6 +497,7 @@ int main(void)
     UnloadTexture(text_menu);                                                                                    //Descarregando o fundo Menu
     UnloadTexture(text_mouse);                                                                                   //Descarregando o ícone mouse
     UnloadImage(text_icon);
+    UnloadTexture(tex_escritorio);
     CloseWindow();                                                                                                      //Fechando o jogo
     //--------------------------------------------------------------------------------------
 
