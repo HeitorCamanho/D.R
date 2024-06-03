@@ -8,6 +8,7 @@
  *                  |Tela|
  * telaLargura (const int) -> Responsável por definir a largura da tela;
  * telaAltura (const int) -> Responsável por definir o comprimento da tela;
+ * cor_up (Color) -> Carrega um valor alfa para efeito na tela de Upgrade;
  *                  |Tela|
  *
  *                  |Colisão|
@@ -73,7 +74,7 @@ double qnt_bonus_tempo = 0;                                                     
 
 bool col_mouse_caixa = false;                                                                                           //Criando a variável para a colisão
 bool fase_delay_fim = false;                                                                                            //Variável que controla o fim do delay inicial da fase
-bool ver_mouse = false;
+
 
 char fase_delay_val [4][2] = {"", "1","2","3"};                                                         //Lista que expõe a contagem do delay inicial
 
@@ -91,8 +92,7 @@ typedef struct {
 
 enum telaJogo {MENU, UPGRADE, DELAY, FASE};                                                                             //Definindo as opções de Telas
 
-Color cor_up = (Color){0,0,0,128};
-Color trasparente = (Color){0,0,0,0};
+Color cor_up = (Color){0,0,0,128};                                                                         //Criando efeito da tela de Upgrade
 #pragma endregion Variáveis
 
 #pragma region Funções Criação                                                                                                         //Criação das Funções
@@ -168,10 +168,6 @@ int main(void)
     Rectangle caixaPapeis = { 20, 15, 150, 180 };                                                   //Criando os valores da caixa de papéis
     Rectangle botaoJogar = {(telaLargura / 2) - 100, (telaAltura / 2), 250, 60};                    //Criando os valores do botão "NOVO JOGO"
     Rectangle botaoSair = {(telaLargura / 2) - 100, (telaAltura / 2) + 100, 250, 60};               //Criando os valores do botão "SAIR"
-    /*Rectangle verf_x1 = {0,0, telaLargura, 5};
-    Rectangle verf_y1 = {0, 0, 5, telaAltura};
-    Rectangle verf_x2 = {0,719, telaLargura , 1};
-    Rectangle verf_y2 = {1279,0, 1,telaAltura}; */
 
     InitWindow(telaLargura, telaAltura, "D.R:Demon's Resources");                                      //Criando a tela de Jogo
     SetWindowIcon(LoadImage("icone jogo.png"));                                                          //Carregando o ícone do arquivo
@@ -187,7 +183,6 @@ int main(void)
 #pragma endregion Load
 
     SetWindowIcon(text_icon);
-
     //--------------------------------------------------------------------------------------
 
 
@@ -199,6 +194,7 @@ int main(void)
         //--------------------------------------------------------------------------------------
         Vector2 spriteMouse = GetMousePosition();                                                                       //Captura as posições do mouse para substituir pelo ícone
         HideCursor();                                                                                                   //Esconde o cursor padrão
+
 
         switch (telaAtual) {                                                                                            //Fluxo de Telas do Jogo
             case MENU:
@@ -221,6 +217,9 @@ int main(void)
                         UnloadTexture(text_papel);                                                               //Descarregando o papel
                         UnloadTexture(text_menu);                                                                //Descarregando o fundo Menu
                         UnloadTexture(text_mouse);                                                               //Descarregando o ícone mouse
+                        UnloadTexture(text_mouse_2);                                                             //Descarregando o ícone mouse pressionado
+                        UnloadImage(text_icon);                                                                   //Descarregnado o ícone do jogo
+                        UnloadTexture(tex_escritorio);                                                           //Descarregando o fundo da Fase
                         CloseWindow();                                                                                  //Fechando o jogo
                     }
                 }
@@ -456,34 +455,14 @@ int main(void)
             }break;
         }
 
-        /*DrawRectangleRec(verf_x1,BLACK);
-        DrawRectangleRec(verf_y1,BLACK);
-        DrawRectangleRec(verf_x2,BLACK);
-        DrawRectangleRec(verf_y2,BLACK);
 
+        if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+            DrawTexture(text_mouse_2, spriteMouse.x - 10, spriteMouse.y - 10, WHITE);                  //Desenhando o ícone na atual posição do mouse
 
-        if (CheckCollisionPointRec(spriteMouse,verf_x1)|| CheckCollisionPointRec(spriteMouse,verf_y1) || CheckCollisionPointRec(spriteMouse,verf_x2) || CheckCollisionPointRec(spriteMouse,verf_y2) && (ver_mouse == false))
-        {
-            UnloadTexture(text_mouse);
-            ver_mouse = true;
         }
         else
         {
-            DrawTexture(text_mouse, spriteMouse.x - 10, spriteMouse.y - 10, WHITE);                  //Desenhando o ícone na atual posição do mouse
-            ver_mouse = false;
-        }*/
-
-        DrawTexture(text_mouse, spriteMouse.x - 10, spriteMouse.y - 10, WHITE);                  //Desenhando o ícone na atual posição do mouse
-        if(IsMouseButtonDown(MOUSE_BUTTON_LEFT))
-        {
-            UnloadTexture(text_mouse);
-            DrawTexture(text_mouse_2, spriteMouse.x - 10, spriteMouse.y - 10, WHITE);
-            if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
-            {
-                UnloadTexture(text_mouse_2);
-                DrawTexture(text_mouse, spriteMouse.x - 10, spriteMouse.y - 10, WHITE);                  //Desenhando o ícone na atual posição do mouse
-            }
-
+            DrawTexture(text_mouse, spriteMouse.x - 10, spriteMouse.y - 10, WHITE);                    //Desenhando o ícone na atual posição do mouse
         }
 
         EndDrawing();
@@ -496,8 +475,9 @@ int main(void)
     UnloadTexture(text_papel);                                                                                   //Descarregando o papel
     UnloadTexture(text_menu);                                                                                    //Descarregando o fundo Menu
     UnloadTexture(text_mouse);                                                                                   //Descarregando o ícone mouse
-    UnloadImage(text_icon);
-    UnloadTexture(tex_escritorio);
+    UnloadTexture(text_mouse_2);                                                                                 //Descarregando o ícone mouse pressionado
+    UnloadImage(text_icon);                                                                                       //Descarregnado o ícone do jogo
+    UnloadTexture(tex_escritorio);                                                                               //Descarregando o fundo da Fase
     CloseWindow();                                                                                                      //Fechando o jogo
     //--------------------------------------------------------------------------------------
 
