@@ -100,12 +100,20 @@ int func_tempo()                                                                
 {
     int func_qnt_tempo = (12 * fase_nivel) + 15;
     return func_qnt_tempo;
+    if (func_qnt_tempo < 0 || func_qnt_tempo == 0.10)
+    {
+        func_qnt_tempo = 0;
+    }
 }
 
 int func_papel()                                                                                                        //Função para calcular a quantidade de papel
 {
     double potencia = pow(4, fase_nivel);
     int func_qnt_papel =  potencia + 20;
+    if (func_qnt_papel < 0)
+    {
+        func_qnt_papel = 0;
+    }
     return func_qnt_papel;
 }
 #pragma endregion Funções
@@ -178,7 +186,9 @@ int main(void)
     Texture2D text_menu = LoadTexture("Assets/Sprites/menu.png");                                               //Carrega o sprite do fundo do Menu
     Texture2D text_mouse = LoadTexture("Assets/Sprites/mouse.png");                                             //Carrega o sprite do ícone do mouse
     Texture2D text_mouse_2 = LoadTexture("Assets/Sprites/mouse-clique.png");
-    Texture2D tex_escritorio = LoadTexture("Assets/Sprites/escritorio.png");
+    Texture2D text_escritorio = LoadTexture("Assets/Sprites/escritorio.png");
+    Texture2D text_tela_delay = LoadTexture("Assets/Sprites/tela-delay.png");
+    Texture2D text_escritorio_1 = LoadTexture("Assets/Sprites/escritorio ortografico 1.png");
     Image text_icon = LoadImage("icone-jogo.png");
 #pragma endregion Load
 
@@ -219,7 +229,9 @@ int main(void)
                         UnloadTexture(text_mouse);                                                               //Descarregando o ícone mouse
                         UnloadTexture(text_mouse_2);                                                             //Descarregando o ícone mouse pressionado
                         UnloadImage(text_icon);                                                                   //Descarregnado o ícone do jogo
-                        UnloadTexture(tex_escritorio);                                                           //Descarregando o fundo da Fase
+                        UnloadTexture(text_escritorio);                                                           //Descarregando o fundo da Fase
+                        UnloadTexture(text_tela_delay);
+                        UnloadTexture(text_escritorio_1);
                         CloseWindow();                                                                                  //Fechando o jogo
                     }
                 }
@@ -369,8 +381,9 @@ int main(void)
 
             case DELAY:
             {
-                DrawText(TextFormat("Fase %d", fase_nivel), (telaLargura / 2) - 40, (telaAltura / 2) - 200, 30, LIGHTGRAY);             //Desenhando o nível atual
-                DrawText(TextFormat("Vidas: %d", fase_vida), (telaLargura / 2) - 40, (telaAltura / 2) + 200, 30, LIGHTGRAY);            //Desenhando as vidas
+                DrawTexture(text_tela_delay,0, 0, WHITE);
+                DrawText(TextFormat("Fase %d", fase_nivel), (telaLargura / 2) - 40, (telaAltura / 2) - 200, 30, YELLOW);             //Desenhando o nível atual
+                DrawText(TextFormat("Vidas: %d", fase_vida), (telaLargura / 2) - 40, (telaAltura / 2) + 200, 30, YELLOW);            //Desenhando as vidas
 
                 if(qnt_cont_frames <= 60)                                                                                                                                      //Atualiza com base na contagem de frames (qnt_cont_frames)
                 {
@@ -387,20 +400,21 @@ int main(void)
                 else if(qnt_cont_frames <= 300)
                 {
                     fase_delay = 0;                                                                                                                                       //Puxa o primeiro valor da lista fase_delay_val("")
-                    DrawText("Clique nos Papéis!!!", (telaLargura / 2) - 120, (telaAltura / 2), 30, LIGHTGRAY);                             //Desenhando a mensagem final da contagem
+                    DrawText("Clique nos Papéis!!!", (telaLargura / 2) - 120, (telaAltura / 2), 30, YELLOW);                             //Desenhando a mensagem final da contagem
                 }
                 else
                 {
                     fase_delay_fim = true;                                                                                                                                  //Encerra o loop do delay
                 }
 
-                DrawText(TextFormat("%s...", fase_delay_val[fase_delay]), (telaLargura / 2), (telaAltura / 2), 30, LIGHTGRAY);          //Desenhando a contagem
+                DrawText(TextFormat("%s...", fase_delay_val[fase_delay]), (telaLargura / 2), (telaAltura / 2), 30, YELLOW);          //Desenhando a contagem
 
             }break;
 
             case FASE:
             {
-                DrawTexture(tex_escritorio,0,0, WHITE);
+                DrawRectangle(0,0,1280,720,BROWN);
+                DrawTexture(text_escritorio_1,3,3, WHITE);
                 DrawRectangle(15,10,160,190,BLACK);
                 DrawTexture(text_papel, 20,15, WHITE);                                                                                                  //Desenhando a caixa de Papéis
                 DrawText(TextFormat("%.2f", qnt_tempo), (telaLargura / 2), 20, 20, LIGHTGRAY);                                              //Desenhando o tempo
@@ -477,7 +491,9 @@ int main(void)
     UnloadTexture(text_mouse);                                                                                   //Descarregando o ícone mouse
     UnloadTexture(text_mouse_2);                                                                                 //Descarregando o ícone mouse pressionado
     UnloadImage(text_icon);                                                                                       //Descarregnado o ícone do jogo
-    UnloadTexture(tex_escritorio);                                                                               //Descarregando o fundo da Fase
+    UnloadTexture(text_escritorio);                                                                               //Descarregando o fundo da Fase
+    UnloadTexture(text_tela_delay);
+    UnloadTexture(text_escritorio_1);
     CloseWindow();                                                                                                      //Fechando o jogo
     //--------------------------------------------------------------------------------------
 
