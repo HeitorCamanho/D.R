@@ -188,8 +188,8 @@ int main(void)
     Texture2D text_mouse_2 = LoadTexture("Assets/Sprites/mouse-clique.png");
     Texture2D text_escritorio = LoadTexture("Assets/Sprites/escritorio.png");
     Texture2D text_tela_delay = LoadTexture("Assets/Sprites/tela-delay.png");
-    Texture2D text_escritorio_1 = LoadTexture("Assets/Sprites/escritorio ortografico 1.png");
-    Texture2D text_escritorio_2 = LoadTexture("Assets/Sprites/escritorio ortografico 2.png");
+    Texture2D text_escritorio_1 = LoadTexture("Assets/Sprites/escritorio-1.png");
+    Texture2D text_escritorio_2 = LoadTexture("Assets/Sprites/escritorio-2.png");
     Texture2D text_mouse_marca = LoadTexture("Assets/Sprites/mouse-marca.png");
     Image text_icon = LoadImage("icone-jogo.png");
 #pragma endregion Load
