@@ -417,7 +417,7 @@ int main(void)
             case FASE:
             {
                 DrawRectangle(0,0,1280,720,BROWN);
-                if(IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+                if(CheckCollisionPointRec(spriteMouse, caixaPapeis) && IsMouseButtonDown(MOUSE_BUTTON_LEFT))
                 {
                     DrawTexture(text_escritorio_2,6,6,WHITE);                  //Desenhando o ícone na atual posição do mouse
                 }
