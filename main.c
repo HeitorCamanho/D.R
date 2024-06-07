@@ -204,6 +204,10 @@ int main(void)
         //--------------------------------------------------------------------------------------
         Vector2 spriteMouse = GetMousePosition();                                                                       //Captura as posições do mouse para substituir pelo ícone
 
+        if(IsKeyPressed(KEY_F)){
+            ToggleFullscreen();
+        }
+
         switch (telaAtual) {                                                                                            //Fluxo de Telas do Jogo
             case MENU:
             {
